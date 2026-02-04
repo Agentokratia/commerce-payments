@@ -1,6 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+/**
+ *         ●     ●     ●
+ *              ╱╲
+ *             ╱  ╲
+ *            ╱    ╲
+ *           ╱  ╱╲  ╲
+ *          ╱__╱  ╲__╲
+ *
+ *       AGENTOKRATIA
+ *
+ *  Your agents. Your keys. Your economy.
+ *
+ *  Forked from Commerce Payments Protocol by Coinbase
+ *  https://github.com/base/commerce-payments
+ */
 import {IMulticall3} from "../interfaces/IMulticall3.sol";
 
 /// @title ERC6492SignatureHandler
@@ -11,7 +26,7 @@ import {IMulticall3} from "../interfaces/IMulticall3.sol";
 ///      validate the signature. It simply calls any ERC-6492 factory/prepare data if present since
 ///      signature validators may not implement ERC-6492 handling.
 ///
-/// @author Coinbase (https://github.com/base/commerce-payments)
+/// @author Agentokratia | Originally by Coinbase (https://github.com/base/commerce-payments)
 abstract contract ERC6492SignatureHandler {
     bytes32 internal constant _ERC6492_MAGIC_VALUE = 0x6492649264926492649264926492649264926492649264926492649264926492;
 

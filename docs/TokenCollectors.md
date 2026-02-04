@@ -97,6 +97,15 @@ The protocol launches with implemented collectors supporting the following major
 - Good fallback option for tokens without native signature support
 - Supports ERC-6492 for smart contract wallet signatures
 
+### [`SwapCollector`](../src/collectors/SwapCollector.sol)
+**Use case**: Cross-token payments via whitelisted DEX aggregator swaps
+- Payer pays with any whitelisted input token, merchant receives the payment's output token
+- Uses Permit2 witness signatures (SwapWitness) to bind swap parameters to payer authorization
+- Whitelisted tokens and aggregators controlled by contract owner
+- Automatic refund of excess output tokens and unused input tokens to payer
+- Pausable by owner for emergency scenarios
+- Enforces clean separation: input token must differ from output token (use Permit2PaymentCollector for same-token)
+
 ### [`PreApprovalPaymentCollector`](../src/collectors/PreApprovalPaymentCollector.sol)
 **Use case**: Traditional ERC-20 tokens with pre-approval flow
 - Requires explicit pre-approval step by payer before authorization

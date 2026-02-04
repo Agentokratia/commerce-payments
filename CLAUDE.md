@@ -1,14 +1,14 @@
-# Commerce Payments Protocol
+# Agentokratia Settlement Protocol
 
 ## Project Overview
 
-The Commerce Payments Protocol is a permissionless protocol for onchain payments that mimics traditional "authorize and capture" payment flows. It facilitates secure escrow-based payments with flexible authorization and capture patterns, similar to how traditional payment processors like Stripe handle two-phase transactions.
+The Agentokratia Settlement Protocol is a permissionless protocol for onchain payments that mimics traditional "authorize and capture" payment flows. Built on top of the Commerce Payments Protocol by Coinbase, it facilitates secure escrow-based payments with flexible authorization and capture patterns, similar to how traditional payment processors like Stripe handle two-phase transactions.
 
 ## Key Concepts
 
 ### Core Components
 - **AuthCaptureEscrow**: Main escrow contract that handles payment lifecycle
-- **TokenCollectors**: Modular components for different authorization methods (ERC-3009, Permit2, allowances, spend permissions)
+- **TokenCollectors**: Modular components for different authorization methods (ERC-3009, Permit2, cross-token swaps)
 - **TokenStore**: Contract that manages escrowed funds
 - **Operators**: Permissionless entities that drive payment flows while remaining trust-minimized
 
@@ -90,15 +90,18 @@ forge script script/Deploy.s.sol --rpc-url $RPC_URL --broadcast
 forge script script/Deploy.s.sol --rpc-url $RPC_URL --broadcast --verify
 ```
 
-## Current Deployments
+## Deployed Contracts
 
-### Base Mainnet & Base Sepolia
+The protocol deploys 4 contracts:
+- **AuthCaptureEscrow** - Core escrow engine managing the full payment lifecycle
+- **ERC3009PaymentCollector** - USDC gasless payments via `receiveWithAuthorization` signatures
+- **Permit2PaymentCollector** - Same-token payments for any ERC-20 via Permit2 signatures
+- **SwapCollector** - Cross-token payments via whitelisted DEX aggregator swaps
+
+### Upstream (Coinbase) Deployments (Base Mainnet & Base Sepolia)
 - **AuthCaptureEscrow**: `0xBdEA0D1bcC5966192B070Fdf62aB4EF5b4420cff`
 - **ERC3009PaymentCollector**: `0x0E3dF9510de65469C4518D7843919c0b8C7A7757`
 - **Permit2PaymentCollector**: `0x992476B9Ee81d52a5BdA0622C333938D0Af0aB26`
-- **PreApprovalPaymentCollector**: `0x1b77ABd71FCD21fbe2398AE821Aa27D1E6B94bC6`
-- **SpendPermissionPaymentCollector**: `0x8d9F34934dc9619e5DC3Df27D0A40b4A744E7eAa`
-- **OperatorRefundCollector**: `0x934907bffd0901b6A21e398B9C53A4A38F02fa5d`
 
 ## Security
 

@@ -13,7 +13,7 @@ pragma solidity ^0.8.28;
  *
  *  Your agents. Your keys. Your economy.
  *
- *  Forked from Commerce Payments Protocol by Coinbase
+ *  Built on top of Commerce Payments Protocol by Coinbase
  *  https://github.com/base/commerce-payments
  */
 import {ISignatureTransfer} from "permit2/interfaces/ISignatureTransfer.sol";
@@ -22,14 +22,20 @@ import {TokenCollector} from "./TokenCollector.sol";
 import {ERC6492SignatureHandler} from "./ERC6492SignatureHandler.sol";
 import {AuthCaptureEscrow} from "../AuthCaptureEscrow.sol";
 
-/// @title Permit2PaymentCollector
+/// @title MerchantRefundCollector
 ///
-/// @notice Collect payments using Permit2 signatures
+/// @notice Collect refund tokens from merchants using Permit2 signatures
 ///
-/// @author Agentokratia | Originally by Coinbase (https://github.com/base/commerce-payments)
-contract Permit2PaymentCollector is TokenCollector, ERC6492SignatureHandler {
+/// @dev Mirrors Permit2PaymentCollector with three key differences:
+///      1. collectorType = Refund (not Payment)
+///      2. owner = paymentInfo.receiver (merchant, not payer)
+///      3. collectorData = abi.encode(uint256 nonce, uint256 deadline, bytes signature)
+///         Merchant-chosen nonce allows multiple partial refunds per payment.
+///
+/// @author Agentokratia
+contract MerchantRefundCollector is TokenCollector, ERC6492SignatureHandler {
     /// @inheritdoc TokenCollector
-    TokenCollector.CollectorType public constant override collectorType = TokenCollector.CollectorType.Payment;
+    TokenCollector.CollectorType public constant override collectorType = TokenCollector.CollectorType.Refund;
 
     /// @notice Permit2 singleton
     ISignatureTransfer public immutable permit2;
@@ -48,22 +54,27 @@ contract Permit2PaymentCollector is TokenCollector, ERC6492SignatureHandler {
 
     /// @inheritdoc TokenCollector
     ///
-    /// @dev Use Permit2 signature transfer to collect any ERC-20 from payers
+    /// @dev Use Permit2 signature transfer to collect refund tokens from merchant (receiver)
+    ///
+    /// @dev collectorData is abi.encode(uint256 nonce, uint256 deadline, bytes signature)
+    ///      The merchant picks a unique nonce per refund to support multiple partial refunds.
     function _collectTokens(
         AuthCaptureEscrow.PaymentInfo calldata paymentInfo,
         address tokenStore,
         uint256 amount,
         bytes calldata collectorData
     ) internal override {
+        (uint256 nonce, uint256 deadline, bytes memory signature) = abi.decode(collectorData, (uint256, uint256, bytes));
+
         permit2.permitTransferFrom({
             permit: ISignatureTransfer.PermitTransferFrom({
-                permitted: ISignatureTransfer.TokenPermissions({token: paymentInfo.token, amount: paymentInfo.maxAmount}),
-                nonce: uint256(_getHashPayerAgnostic(paymentInfo)),
-                deadline: paymentInfo.preApprovalExpiry
+                permitted: ISignatureTransfer.TokenPermissions({token: paymentInfo.token, amount: amount}),
+                nonce: nonce,
+                deadline: deadline
             }),
             transferDetails: ISignatureTransfer.SignatureTransferDetails({to: tokenStore, requestedAmount: amount}),
-            owner: paymentInfo.payer,
-            signature: _handleERC6492Signature(collectorData)
+            owner: paymentInfo.receiver,
+            signature: _handleERC6492Signature(signature)
         });
     }
 }

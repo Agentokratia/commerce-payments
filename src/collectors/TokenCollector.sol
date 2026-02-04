@@ -1,13 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+/**
+ *         ●     ●     ●
+ *              ╱╲
+ *             ╱  ╲
+ *            ╱    ╲
+ *           ╱  ╱╲  ╲
+ *          ╱__╱  ╲__╲
+ *
+ *       AGENTOKRATIA
+ *
+ *  Your agents. Your keys. Your economy.
+ *
+ *  Forked from Commerce Payments Protocol by Coinbase
+ *  https://github.com/base/commerce-payments
+ */
 import {AuthCaptureEscrow} from "../AuthCaptureEscrow.sol";
 
 /// @title TokenCollector
 ///
 /// @notice Abstract contract for shared token collector utilities
 ///
-/// @author Coinbase (https://github.com/base/commerce-payments)
+/// @author Agentokratia | Originally by Coinbase (https://github.com/base/commerce-payments)
 abstract contract TokenCollector {
     /// @notice Type differentiation between payment and refund collection flows
     enum CollectorType {
