@@ -1,6 +1,6 @@
 # Fee System
 
-The Commerce Payments Protocol implements a fee system that provides flexibility while maintaining security through pre-defined constraints. Fees are specified in the initial `PaymentInfo` struct and validated during `charge()` and `capture()` operations.
+The Agentokratia Settlement Protocol implements a fee system that provides flexibility while maintaining security through pre-defined constraints. Fees are specified in the initial `PaymentInfo` struct and validated during `charge()` and `capture()` operations.
 
 ## Overview
 

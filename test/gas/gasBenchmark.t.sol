@@ -108,14 +108,19 @@ contract RefundGasBenchmark is GasBenchmarkBase {
         vm.prank(operator);
         authCaptureEscrow.capture(paymentInfo, BENCHMARK_AMOUNT, BENCHMARK_FEE_BPS, feeReceiver);
 
-        // Give operator tokens for refund and approve collector
-        mockERC3009Token.mint(operator, BENCHMARK_AMOUNT);
-        vm.prank(operator);
-        mockERC3009Token.approve(address(operatorRefundCollector), BENCHMARK_AMOUNT);
+        // Give receiver tokens for refund and approve Permit2
+        mockERC3009Token.mint(receiver, BENCHMARK_AMOUNT);
+        vm.prank(receiver);
+        mockERC3009Token.approve(address(permit2), type(uint256).max);
     }
 
     function test_refund_benchmark() public {
+        bytes memory refundSig = _signPermit2RefundTransfer(
+            address(mockERC3009Token), BENCHMARK_AMOUNT, type(uint256).max, 1, RECEIVER_PK
+        );
+        bytes memory collectorData = abi.encode(uint256(1), type(uint256).max, refundSig);
+
         vm.prank(operator);
-        authCaptureEscrow.refund(paymentInfo, BENCHMARK_AMOUNT, address(operatorRefundCollector), "");
+        authCaptureEscrow.refund(paymentInfo, BENCHMARK_AMOUNT, address(merchantRefundCollector), collectorData);
     }
 }

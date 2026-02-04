@@ -131,7 +131,6 @@ contract ChargeTest is AuthCaptureEscrowBase {
 
         AuthCaptureEscrow.PaymentInfo memory paymentInfo = _createPaymentInfo({payer: payerEOA, maxAmount: amount});
 
-        // Set authorize deadline after capture deadline
         paymentInfo.preApprovalExpiry = preApprovalExpiry;
         paymentInfo.authorizationExpiry = authorizationExpiry;
         paymentInfo.refundExpiry = refundExpiry;
@@ -168,7 +167,6 @@ contract ChargeTest is AuthCaptureEscrowBase {
 
         AuthCaptureEscrow.PaymentInfo memory paymentInfo = _createPaymentInfo({payer: payerEOA, maxAmount: amount});
 
-        // Set authorize deadline after capture deadline
         paymentInfo.preApprovalExpiry = preApprovalExpiry;
         paymentInfo.authorizationExpiry = authorizationExpiry;
         paymentInfo.refundExpiry = refundExpiry;
@@ -311,55 +309,6 @@ contract ChargeTest is AuthCaptureEscrowBase {
             paymentInfo.minFeeBps,
             paymentInfo.feeReceiver
         );
-    }
-
-    function test_allowsRefund(uint120 authorizedAmount) public {
-        uint256 payerBalance = mockERC3009Token.balanceOf(payerEOA);
-
-        vm.assume(authorizedAmount > 3 && authorizedAmount <= payerBalance);
-
-        uint256 chargeAmount = authorizedAmount / 2;
-        uint256 refundAmount = chargeAmount / 2;
-
-        AuthCaptureEscrow.PaymentInfo memory paymentInfo = _createPaymentInfo(payerEOA, authorizedAmount);
-        vm.warp(paymentInfo.authorizationExpiry - 1);
-
-        bytes memory signature = _signERC3009ReceiveWithAuthorizationStruct(paymentInfo, payer_EOA_PK);
-
-        // First charge the payment
-        vm.prank(operator);
-        authCaptureEscrow.charge(
-            paymentInfo,
-            chargeAmount,
-            address(erc3009PaymentCollector),
-            signature,
-            paymentInfo.minFeeBps,
-            paymentInfo.feeReceiver
-        );
-
-        // Fund operator for refund
-        mockERC3009Token.mint(operator, refundAmount);
-        vm.prank(operator);
-        mockERC3009Token.approve(address(operatorRefundCollector), refundAmount);
-
-        uint256 payerBalanceBefore = mockERC3009Token.balanceOf(payerEOA);
-        uint256 operatorBalanceBefore = mockERC3009Token.balanceOf(operator);
-
-        // Execute refund
-        vm.prank(operator);
-        authCaptureEscrow.refund(paymentInfo, refundAmount, address(operatorRefundCollector), "");
-
-        // Verify balances
-        assertEq(mockERC3009Token.balanceOf(operator), operatorBalanceBefore - refundAmount);
-        assertEq(mockERC3009Token.balanceOf(payerEOA), payerBalanceBefore + refundAmount);
-
-        // Try to refund more than remaining captured amount
-        uint256 remainingCaptured = chargeAmount - refundAmount;
-        vm.expectRevert(
-            abi.encodeWithSelector(AuthCaptureEscrow.RefundExceedsCapture.selector, chargeAmount, remainingCaptured)
-        );
-        vm.prank(operator);
-        authCaptureEscrow.refund(paymentInfo, chargeAmount, address(operatorRefundCollector), "");
     }
 
     function test_reverts_whenFeeBpsBelowMin(uint120 amount, uint16 minFeeBps, uint16 maxFeeBps, uint16 captureFeeBps)

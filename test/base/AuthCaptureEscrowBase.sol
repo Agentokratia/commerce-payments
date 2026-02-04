@@ -20,7 +20,7 @@ import {ERC3009PaymentCollector} from "../../src/collectors/ERC3009PaymentCollec
 import {PreApprovalPaymentCollector} from "../../src/collectors/PreApprovalPaymentCollector.sol";
 import {Permit2PaymentCollector} from "../../src/collectors/Permit2PaymentCollector.sol";
 import {SpendPermissionPaymentCollector} from "../../src/collectors/SpendPermissionPaymentCollector.sol";
-import {OperatorRefundCollector} from "../../src/collectors/OperatorRefundCollector.sol";
+import {MerchantRefundCollector} from "../../src/collectors/MerchantRefundCollector.sol";
 import {ERC20UnsafeTransferTokenCollector} from "../../test/mocks/ERC20UnsafeTransferTokenCollector.sol";
 
 contract AuthCaptureEscrowBase is Test, DeployPermit2 {
@@ -40,7 +40,7 @@ contract AuthCaptureEscrowBase is Test, DeployPermit2 {
     PreApprovalPaymentCollector public preApprovalPaymentCollector;
     Permit2PaymentCollector public permit2PaymentCollector;
     SpendPermissionPaymentCollector public spendPermissionPaymentCollector;
-    OperatorRefundCollector public operatorRefundCollector;
+    MerchantRefundCollector public merchantRefundCollector;
     ERC20UnsafeTransferTokenCollector public erc20UnsafeTransferPaymentCollector;
 
     uint256 public magicSpendOwnerPk = 0xC014BA53;
@@ -51,6 +51,7 @@ contract AuthCaptureEscrowBase is Test, DeployPermit2 {
     address public feeReceiver;
     uint16 constant FEE_BPS = 100; // 1%
     uint256 internal constant payer_EOA_PK = 0x0C0DE;
+    uint256 internal constant RECEIVER_PK = 2;
 
     bytes32 constant _RECEIVE_WITH_AUTHORIZATION_TYPEHASH =
         0xd099cc98ef71107a616c4f0f941f04c322d8e254fe26b3c6668db87aae413de8;
@@ -87,7 +88,7 @@ contract AuthCaptureEscrowBase is Test, DeployPermit2 {
         permit2PaymentCollector = new Permit2PaymentCollector(address(authCaptureEscrow), permit2, multicall3);
         spendPermissionPaymentCollector =
             new SpendPermissionPaymentCollector(address(authCaptureEscrow), address(spendPermissionManager));
-        operatorRefundCollector = new OperatorRefundCollector(address(authCaptureEscrow));
+        merchantRefundCollector = new MerchantRefundCollector(address(authCaptureEscrow), permit2, multicall3);
         erc20UnsafeTransferPaymentCollector = new ERC20UnsafeTransferTokenCollector(address(authCaptureEscrow));
 
         // Setup roles
@@ -187,6 +188,31 @@ contract AuthCaptureEscrowBase is Test, DeployPermit2 {
                 address(permit2PaymentCollector),
                 permit.nonce,
                 permit.deadline
+            )
+        );
+        bytes32 domainSeparator = IPermit2(permit2).DOMAIN_SEPARATOR();
+
+        bytes32 msgHash = keccak256(abi.encodePacked("\x19\x01", domainSeparator, permitHash));
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, msgHash);
+        return abi.encodePacked(r, s, v);
+    }
+
+    function _signPermit2RefundTransfer(
+        address token,
+        uint256 amount,
+        uint256 deadline,
+        uint256 nonce,
+        uint256 privateKey
+    ) internal view returns (bytes memory) {
+        bytes32 tokenPermissionsHash =
+            keccak256(abi.encode(_TOKEN_PERMISSIONS_TYPEHASH, token, amount));
+        bytes32 permitHash = keccak256(
+            abi.encode(
+                _PERMIT_TRANSFER_FROM_TYPEHASH,
+                tokenPermissionsHash,
+                address(merchantRefundCollector),
+                nonce,
+                deadline
             )
         );
         bytes32 domainSeparator = IPermit2(permit2).DOMAIN_SEPARATOR();

@@ -2,7 +2,7 @@
 
 ## Security Audits
 
-Audited by [Spearbit](https://spearbit.com/) and Coinbase Protocol Security.
+The underlying protocol was audited by [Spearbit](https://spearbit.com/) and Coinbase Protocol Security.
 
 | Audit | Date | Report |
 |--------|---------|---------|

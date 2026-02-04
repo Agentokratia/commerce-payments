@@ -1,6 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+/**
+ *         ●     ●     ●
+ *              ╱╲
+ *             ╱  ╲
+ *            ╱    ╲
+ *           ╱  ╱╲  ╲
+ *          ╱__╱  ╲__╲
+ *
+ *       AGENTOKRATIA
+ *
+ *  Your agents. Your keys. Your economy.
+ *
+ *  Forked from Commerce Payments Protocol by Coinbase
+ *  https://github.com/base/commerce-payments
+ */
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ReentrancyGuardTransient} from "solady/utils/ReentrancyGuardTransient.sol";

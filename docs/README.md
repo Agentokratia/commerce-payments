@@ -1,7 +1,7 @@
-# Commerce Payments Protocol
+# Agentokratia Settlement Protocol
 ## Overview
 
-Today, onchain payments work well for peer-to-peer transactions, but not for more complex commerce purchases, which require features like refunds, delayed capture, and tax finalization. For example, in commerce, merchants can run out of inventory and need to cancel a purchase, buyers can request refunds, orders may be completed in multiple deliveries, and more. The Commerce Payments Protocol enables onchain payments for commerce at scale by bridging this gap.
+Today, onchain payments work well for peer-to-peer transactions, but not for more complex commerce purchases, which require features like refunds, delayed capture, and tax finalization. For example, in commerce, merchants can run out of inventory and need to cancel a purchase, buyers can request refunds, orders may be completed in multiple deliveries, and more. The Agentokratia Settlement Protocol enables onchain payments for commerce at scale by bridging this gap.
 
 Traditional finance’s solution is called "authorize and capture":
 - **Authorization** places hold on buyer funds
@@ -9,7 +9,7 @@ Traditional finance’s solution is called "authorize and capture":
 
 This introduces an intermediary state of guaranteeing the ability to pay in the future without actually having finalized payment right now. Until now, onchain payments have been missing this capability.
 
-The Commerce Payments Protocol brings Auth+Capture onchain through an Escrow smart contract. To authorize, funds move from buyer to Escrow, guaranteeing the ability to pay merchants. To capture, funds move from Escrow to merchant, finalizing payment. This simple 2-step process unlocks onchain payments for commerce at scale.
+The Agentokratia Settlement Protocol brings Auth+Capture onchain through an Escrow smart contract. To authorize, funds move from buyer to Escrow, guaranteeing the ability to pay merchants. To capture, funds move from Escrow to merchant, finalizing payment. This simple 2-step process unlocks onchain payments for commerce at scale.
 
 To create a layer of abstraction between the payer or receiver of a given payment the need for direct interaction with the chain, the protocol is designed around the concept of a payment "operator". Operators drive payment movement through the Escrow, absorbing transaction fees and enabling background automations seamlessly.
 
@@ -46,7 +46,7 @@ The protocol provides six main functions that handle the complete payment lifecy
 
 <div align="center">
   <img src="diagrams/ContractsArchitecture.png" alt="Contracts Architecture Diagram" width="80%">
-  <p><em>Commerce Payments Protocol smart contract architecture</em></p>
+  <p><em>Agentokratia Settlement Protocol smart contract architecture</em></p>
 </div>
 
 ### 1. [`AuthCaptureEscrow`](../src/AuthCaptureEscrow.sol)
@@ -62,8 +62,7 @@ See [Token Collectors](TokenCollectors.md) for complete documentation.
 - **ERC3009PaymentCollector**: Uses ERC-3009 `receiveWithAuthorization` signatures
 - **Permit2PaymentCollector**: Uses Permit2 signature-based transfers
 - **PreApprovalPaymentCollector**: Uses traditional ERC-20 allowances with pre-approval
-- **SpendPermissionPaymentCollector**: Uses Coinbase's Spend Permission system
-- **OperatorRefundCollector**: Handles refunds from operator funds
+- **SwapCollector**: Cross-token payments via whitelisted DEX aggregator swaps
 
 ### 3. [Token Stores](../src/TokenStore.sol)
 Per-operator token vaults that hold escrowed funds.

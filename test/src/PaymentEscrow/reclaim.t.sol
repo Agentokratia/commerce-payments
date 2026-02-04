@@ -36,9 +36,10 @@ contract ReclaimTest is AuthCaptureEscrowBase {
         vm.assume(currentTime < authorizationExpiry);
 
         AuthCaptureEscrow.PaymentInfo memory paymentInfo = _createPaymentInfo({payer: payerEOA, maxAmount: amount});
-        // Set both deadlines - ensure preApprovalExpiry is before authorizationExpiry
+        // Set deadlines - ensure preApproval <= refund <= authorization
         paymentInfo.authorizationExpiry = authorizationExpiry;
-        paymentInfo.preApprovalExpiry = authorizationExpiry - 1 hours; // Set authorize deadline before capture deadline
+        paymentInfo.preApprovalExpiry = authorizationExpiry - 1 hours;
+        paymentInfo.refundExpiry = authorizationExpiry + 1 hours; // preApproval <= authorization <= refund
 
         // First authorize the payment
         bytes memory signature = _signERC3009ReceiveWithAuthorizationStruct(paymentInfo, payer_EOA_PK);
@@ -105,9 +106,10 @@ contract ReclaimTest is AuthCaptureEscrowBase {
         vm.assume(timeAfterDeadline < type(uint48).max);
 
         AuthCaptureEscrow.PaymentInfo memory paymentInfo = _createPaymentInfo({payer: payerEOA, maxAmount: amount});
-        // Set both deadlines - ensure preApprovalExpiry is before authorizationExpiry
+        // Set deadlines - ensure preApproval <= authorization <= refund
         paymentInfo.authorizationExpiry = authorizationExpiry;
-        paymentInfo.preApprovalExpiry = authorizationExpiry - 1 hours; // Set authorize deadline before capture deadline
+        paymentInfo.preApprovalExpiry = authorizationExpiry - 1 hours;
+        paymentInfo.refundExpiry = authorizationExpiry + 1 hours; // authorization <= refund
 
         // First authorize the payment
         bytes memory signature = _signERC3009ReceiveWithAuthorizationStruct(paymentInfo, payer_EOA_PK);

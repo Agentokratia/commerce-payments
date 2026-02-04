@@ -1,6 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+/**
+ *         ●     ●     ●
+ *              ╱╲
+ *             ╱  ╲
+ *            ╱    ╲
+ *           ╱  ╱╲  ╲
+ *          ╱__╱  ╲__╲
+ *
+ *       AGENTOKRATIA
+ *
+ *  Your agents. Your keys. Your economy.
+ *
+ *  Forked from Commerce Payments Protocol by Coinbase
+ *  https://github.com/base/commerce-payments
+ */
 import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// @title TokenStore
@@ -9,7 +24,7 @@ import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeE
 ///
 /// @dev Deployed on demand by AuthCaptureEscrow via CREATE2 clones
 ///
-/// @author Coinbase (https://github.com/base/commerce-payments)
+/// @author Agentokratia | Originally by Coinbase (https://github.com/base/commerce-payments)
 contract TokenStore {
     /// @notice AuthCaptureEscrow singleton that created this token store
     address public immutable authCaptureEscrow;

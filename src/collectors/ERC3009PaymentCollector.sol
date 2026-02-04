@@ -1,6 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+/**
+ *         ●     ●     ●
+ *              ╱╲
+ *             ╱  ╲
+ *            ╱    ╲
+ *           ╱  ╱╲  ╲
+ *          ╱__╱  ╲__╲
+ *
+ *       AGENTOKRATIA
+ *
+ *  Your agents. Your keys. Your economy.
+ *
+ *  Forked from Commerce Payments Protocol by Coinbase
+ *  https://github.com/base/commerce-payments
+ */
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -13,7 +28,7 @@ import {ERC6492SignatureHandler} from "./ERC6492SignatureHandler.sol";
 ///
 /// @notice Collect payments using ERC-3009 ReceiveWithAuthorization signatures
 ///
-/// @author Coinbase (https://github.com/base/commerce-payments)
+/// @author Agentokratia | Originally by Coinbase (https://github.com/base/commerce-payments)
 contract ERC3009PaymentCollector is TokenCollector, ERC6492SignatureHandler {
     /// @inheritdoc TokenCollector
     TokenCollector.CollectorType public constant override collectorType = TokenCollector.CollectorType.Payment;
